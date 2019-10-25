@@ -54,7 +54,7 @@ class InvertedIndex:
                         self.inverted_lists[word] = []
 
                     # list contains a particular record id at most once.
-                    elif record_id in self.inverted_lists[word]:
+                    elif record_id == self.inverted_lists[word][-1]:
                         continue
                     self.inverted_lists[word].append(record_id)
 
@@ -120,31 +120,13 @@ class InvertedIndex:
 
     def main(self):
         """
-        >>> ii = InvertedIndex()
-        >>> ii.main()
-
-
+        input your ...
         """
-        file_name = input("put file name : ")
-        self.read_from_file(file_name)
-        print(self.inverted_lists)
-
-        with open(file_name, "r") as file:
-            word = input()
-            if word in self.inverted_lists:
-                number = self.inverted_lists[word]
-            if len(number) == 0:
-                print("No Match")
-            # TODO: print the frist three matches
-                return
-            record_id = 0
-            for line in file:
-                line = line.strip()
-                if (record_id == number[0]-1):
-                    print(line)
-                record_id += 1
-
-
+        search = str(input("please put your search keywords"))
+        search = search.split(' ')
+        x = self.process_query(search)
+        # TODO print the first three lines
+        print(x)
 
 
 if __name__ == "__main__":
@@ -155,8 +137,8 @@ if __name__ == "__main__":
 
     file_name = sys.argv[1]
     ii = InvertedIndex()
-    ii.main()
     ii.read_from_file(file_name)
+    ii.main()
 
     for word, inverted_list in ii.inverted_lists.items():
         print("%d\t%s" % (len(inverted_list), word))

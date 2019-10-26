@@ -105,8 +105,9 @@ class InvertedIndex:
         if len(keywords) < 2:
             return result
 
-        list1 = self.inverted_lists[keywords[0]]
-        list2 = self.inverted_lists[keywords[1]]
+        list1 = self.inverted_lists.get(keywords[0], [])
+        list2 = self.inverted_lists.get(keywords[1], [])
+
         result = self.intersect(list1, list2)
         for i in range(2, len(keywords)):
             if keywords[i] in self.inverted_lists.keys():
@@ -118,15 +119,71 @@ class InvertedIndex:
                 return []
         return result
 
-    def main(self):
+    def main(self, file_name):
         """
         input your ...
         """
-        search = str(input("please put your search keywords"))
-        search = search.split(' ')
-        x = self.process_query(search)
-        # TODO print the first three lines
-        print(x)
+        f = open(file_name)
+        lines=f.readlines()
+        while True:
+            search = str(input("Please put your keywords: "))
+            search_lower = search.lower().strip()
+            # search_lower_list = search_lower.split(' ')
+            search_lower_list = re.split("[^A-Za-z]+", search_lower)
+
+            search = search.split(' ')
+            x = self.process_query(search)
+            print(x)
+
+            if len(x) < 3:
+                for i in range(0, len(x)):
+                    print(x[i])
+                    words = lines[x[i]-1]
+
+                    words_copy = words
+
+                    words_lower = words_copy.lower().strip()
+                    # words_list = words_lower.split(' ')
+                    search_lower_list = re.split("[^A-Za-z]+", search_lower)
+
+
+                    for i in words:
+                    # for i in re.split("[^A-Za-z]+", search_lower):
+                        if i.lower().strip() in search_lower_list:
+                            print(11111111111111)
+
+                    # print(words)
+                    # print(words_list)
+                    # print(words_lower)
+
+                continue
+            # len > 3
+            else:
+                for i in range(0, 3):
+                    print("\n", x[i])
+                    words = lines[x[i]-1]
+                    words_copy = words
+
+                    words_lower = words_copy.lower().strip()
+                    words_list = words_lower.split(' ')
+
+                    for i in words_list:
+                    # for i in re.split("[^A-Za-z]+", search_lower):
+                        w = i.lower().strip()
+                        # print(w)
+                        if w in search_lower_list:
+                            print('\x1b[6;30;42m' + w + '\x1b[0m', end = ' ')
+
+                            # print(w)
+                        else:
+                            print(i, end = ' ')
+
+                    # print(words)
+                    # print(words_list)
+                    # print(words_lower)
+                print("\n")
+
+                continue
 
 
 if __name__ == "__main__":
@@ -138,7 +195,7 @@ if __name__ == "__main__":
     file_name = sys.argv[1]
     ii = InvertedIndex()
     ii.read_from_file(file_name)
-    ii.main()
+    ii.main(file_name)
 
     for word, inverted_list in ii.inverted_lists.items():
         print("%d\t%s" % (len(inverted_list), word))

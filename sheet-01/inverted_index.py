@@ -121,69 +121,25 @@ class InvertedIndex:
 
     def main(self, file_name):
         """
-        input your ...
+        main function that reads a text file and get inputs from user to search in it.
+        Return: outputs the title and description of up to three matching records.
         """
         f = open(file_name)
-        lines=f.readlines()
+        lines = f.readlines()
         while True:
             search = str(input("Please put your keywords: "))
-            search_lower = search.lower().strip()
-            # search_lower_list = search_lower.split(' ')
-            search_lower_list = re.split("[^A-Za-z]+", search_lower)
-
-            search = search.split(' ')
-            x = self.process_query(search)
-            print(x)
-
-            if len(x) < 3:
-                for i in range(0, len(x)):
-                    print(x[i])
-                    words = lines[x[i]-1]
-
-                    words_copy = words
-
-                    words_lower = words_copy.lower().strip()
-                    # words_list = words_lower.split(' ')
-                    search_lower_list = re.split("[^A-Za-z]+", search_lower)
-
-
-                    for i in words:
-                    # for i in re.split("[^A-Za-z]+", search_lower):
-                        if i.lower().strip() in search_lower_list:
-                            print(11111111111111)
-
-                    # print(words)
-                    # print(words_list)
-                    # print(words_lower)
-
-                continue
-            # len > 3
-            else:
-                for i in range(0, 3):
-                    print("\n", x[i])
-                    words = lines[x[i]-1]
-                    words_copy = words
-
-                    words_lower = words_copy.lower().strip()
-                    words_list = words_lower.split(' ')
-
-                    for i in words_list:
-                    # for i in re.split("[^A-Za-z]+", search_lower):
-                        w = i.lower().strip()
-                        # print(w)
-                        if w in search_lower_list:
-                            print('\x1b[6;30;42m' + w + '\x1b[0m', end = ' ')
-
-                            # print(w)
-                        else:
-                            print(i, end = ' ')
-
-                    # print(words)
-                    # print(words_list)
-                    # print(words_lower)
-                print("\n")
-
-                continue
+            search = re.split("[^A-Za-z]+", search)
+            search_lower = []
+            for i in search:
+                search_lower.append(i.lower().strip())
+            x = self.process_query(search_lower)
+            counter = 0
+            for i in range(0, 3):
+                if counter >= len(x):
+                    break
+                words = lines[x[i]-1]
+                print(words)
+                counter += 1
 
 
 if __name__ == "__main__":

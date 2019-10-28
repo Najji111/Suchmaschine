@@ -1,3 +1,4 @@
+#!/bin/python3
 """
 Copyright 2019, University of Freiburg
 Hannah Bast <bast@cs.uni-freiburg.de>
@@ -52,11 +53,10 @@ class InvertedIndex:
                     if word not in self.inverted_lists:
                         # The word is seen for first time, create a new list.
                         self.inverted_lists[word] = []
-
-                    # list contains a particular record id at most once.
-                    elif record_id == self.inverted_lists[word][-1]:
-                        continue
-                    self.inverted_lists[word].append(record_id)
+                        self.inverted_lists[word].append(record_id)
+                    else:
+                        if self.inverted_lists[word][-1] != record_id:
+                            self.inverted_lists[word].append(record_id)
 
     def intersect(self, list1, list2):
         """
@@ -69,20 +69,22 @@ class InvertedIndex:
         >>> ii.intersect([1, 2, 5, 7], [1, 3, 5, 6, 7, 9])
         [1, 5, 7]
         """
-        pass  # TODO: add your code here
-        result = []
-        i = j = 0
-        while (i < len(list1) and j < len(list2)):
-            if list1[i] == list2[j]:
-                result.append(list1[i])
-                i += 1
-                j += 1
-            elif list1[i] < list2[j]:
-                i += 1
+        intersected = []
+        l1 = l2 = 0
+        # search until end of one list
+        while l1 < len(list1) and l2 < len(list2):
+            # increase lower
+            if list1[l1] < list2[l2]:
+                l1 += 1
+            elif list1[l1] > list2[l2]:
+                l2 += 1
             else:
-                j += 1
+                # if equal note and increase both
+                intersected.append(list1[l1])
+                l1 += 1
+                l2 += 1
 
-        return result
+        return intersected
 
     def process_query(self, keywords):
         """
@@ -100,33 +102,19 @@ class InvertedIndex:
         >>> ii.process_query(["doc", "movie", "comedy"])
         []
         """
-        pass  # TODO: add your code here
-        result = []
-        if len(keywords) < 2:
-            return result
-
-        list1 = self.inverted_lists[keywords[0]]
-        list2 = self.inverted_lists[keywords[1]]
-        result = self.intersect(list1, list2)
-        for i in range(2, len(keywords)):
-            if keywords[i] in self.inverted_lists.keys():
-                tmp = self.inverted_lists[keywords[i]]
-                result = self.intersect(result, tmp)
-                continue
-            else:
-                # if  a keyword in the query has no inverted list in the index.
+        intersected = []
+        for word in keywords:
+            if self.inverted_lists.get(word) is None:
                 return []
-        return result
+            if len(intersected) == 0:
+                intersected = self.inverted_lists[word]
+                continue
 
-    def main(self):
-        """
-        input your ...
-        """
-        search = str(input("please put your search keywords"))
-        search = search.split(' ')
-        x = self.process_query(search)
-        # TODO print the first three lines
-        print(x)
+            # intersect last result with current
+            intersected = self.intersect(intersected,
+                                         self.inverted_lists[word])
+
+        return intersected
 
 
 if __name__ == "__main__":
@@ -138,7 +126,17 @@ if __name__ == "__main__":
     file_name = sys.argv[1]
     ii = InvertedIndex()
     ii.read_from_file(file_name)
-    ii.main()
+
+    # read keyword from std input, process_query and print result
+    # read keywords untli less than tree matches in the result
+    
+    result = []
+    b_first = True
+
+    while b_first or len(result) < 4:
+        b_first = False
+
+
 
     for word, inverted_list in ii.inverted_lists.items():
         print("%d\t%s" % (len(inverted_list), word))

@@ -129,13 +129,9 @@ class InvertedIndex:
         self.read_from_file(file_name)
 
         res = []
-        b_first = True
-        while b_first or len(res) >  3:
+        while True:
             word = str(input("Query: ")).lower().strip()
-            if b_first:
-                res = self.process_query(word)
-            else:
-                res = self.intersect(res, self.process_query(word))
+            res = self.process_query(word)
             
             # Print lines of the first three results.
             for i in range(1, 4):

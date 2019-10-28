@@ -1,0 +1,5 @@
+Good query: Leonardo Titanic
+Bad query: james bond baseball
+	Expected is am "James Bond" movie about baseball. But the result is a movie over baseball with "Ward Bond" and "James Stewart".
+
+My experience: I spend 5 hours on the exercise, without any major problem. Implementing the algorithm from the lecture was not hard, specially with the demo in the lecture recording. 

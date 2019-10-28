@@ -9,7 +9,7 @@ Patrick Brosi <brosi@cs.uni-freiburg.de>
 import re
 import readline  # NOQA
 import sys
-
+import linecache
 
 class InvertedIndex:
     """
@@ -69,7 +69,7 @@ class InvertedIndex:
         >>> ii.intersect([1, 2, 5, 7], [1, 3, 5, 6, 7, 9])
         [1, 5, 7]
         """
-        intersected = []
+        i_sected = []
         l1 = l2 = 0
         # search until end of one list
         while l1 < len(list1) and l2 < len(list2):
@@ -80,11 +80,11 @@ class InvertedIndex:
                 l2 += 1
             else:
                 # if equal note and increase both
-                intersected.append(list1[l1])
+                i_sected.append(list1[l1])
                 l1 += 1
                 l2 += 1
 
-        return intersected
+        return i_sected
 
     def process_query(self, keywords):
         """
@@ -102,19 +102,50 @@ class InvertedIndex:
         >>> ii.process_query(["doc", "movie", "comedy"])
         []
         """
-        intersected = []
+        res = []
+        # Convert a string to list
+        if not isinstance(keywords, list):
+            keywords = list(keywords.split(" "))
+        # Search the inverdex index for each word and computed the results.
         for word in keywords:
+            word = word.lower().strip()
             if self.inverted_lists.get(word) is None:
                 return []
-            if len(intersected) == 0:
-                intersected = self.inverted_lists[word]
+            elif len(res) == 0:
+                res = self.inverted_lists[word]
                 continue
 
             # intersect last result with current
-            intersected = self.intersect(intersected,
-                                         self.inverted_lists[word])
+            res = self.intersect(res,
+                                 self.inverted_lists[word])
 
-        return intersected
+        return res
+
+    def main(self, file_name):    
+        """
+        Reads line by line the file in argv[1]. Subsequent read keyword from std
+        input, process query and print results until most three records.
+        """
+        self.read_from_file(file_name)
+
+        res = []
+        b_first = True
+        while b_first or len(res) >  3:
+            word = str(input("Query: ")).lower().strip()
+            if b_first:
+                res = self.process_query(word)
+            else:
+                res = self.intersect(res, self.process_query(word))
+            
+            # Print lines of the first three results.
+            for i in range(1, 4):
+                if i > len(res):
+                    break
+                print(linecache.getline(file_name, res[i-1]))
+            # reset first time label
+            b_first = False
+        
+        linecache.clearcache()
 
 
 if __name__ == "__main__":
@@ -125,18 +156,12 @@ if __name__ == "__main__":
 
     file_name = sys.argv[1]
     ii = InvertedIndex()
-    ii.read_from_file(file_name)
+#    ii.read_from_file(file_name)
 
-    # read keyword from std input, process_query and print result
-    # read keywords untli less than tree matches in the result
+#    for word, inverted_list in ii.inverted_lists.items():
+#        print("%d\t%s" % (len(inverted_list), word))
+
+    ii.main(file_name)
     
-    result = []
-    b_first = True
-
-    while b_first or len(result) < 4:
-        b_first = False
 
 
-
-    for word, inverted_list in ii.inverted_lists.items():
-        print("%d\t%s" % (len(inverted_list), word))

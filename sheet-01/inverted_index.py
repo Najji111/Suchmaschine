@@ -11,6 +11,7 @@ import readline  # NOQA
 import sys
 import linecache
 
+
 class InvertedIndex:
     """
     A simple inverted index as explained in lecture 1.
@@ -121,10 +122,11 @@ class InvertedIndex:
 
         return res
 
-    def main(self, file_name):    
+    def main(self, file_name):
         """
-        Reads line by line the file in argv[1]. Subsequent read keyword from std
-        input, process query and print results until most three records.
+        Reads line by line the file in argv[1].
+        Subsequent read keyword from std input,
+        process query and print results until most three records.
         """
         self.read_from_file(file_name)
 
@@ -132,15 +134,14 @@ class InvertedIndex:
         while True:
             word = str(input("Query: ")).lower().strip()
             res = self.process_query(word)
-            
+
             # Print lines of the first three results.
             for i in range(1, 4):
                 if i > len(res):
                     break
                 print(linecache.getline(file_name, res[i-1]))
             # reset first time label
-            b_first = False
-        
+
         linecache.clearcache()
 
 
@@ -153,11 +154,7 @@ if __name__ == "__main__":
     file_name = sys.argv[1]
     ii = InvertedIndex()
 #    ii.read_from_file(file_name)
-
 #    for word, inverted_list in ii.inverted_lists.items():
 #        print("%d\t%s" % (len(inverted_list), word))
 
     ii.main(file_name)
-    
-
-

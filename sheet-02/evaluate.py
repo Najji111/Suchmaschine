@@ -14,9 +14,6 @@ class Evaluate:
     """
     Class for evaluating the InvertedIndex class against a benchmark.
     """
-    def __init__(self):
-        self.records = []
-
     def read_benchmark(self, file_name):
         """
         Read a benchmark from the given file. The expected format of the file
@@ -28,12 +25,17 @@ class Evaluate:
         >>> sorted(benchmark.items())
         [('animated film', {1, 3, 4}), ('short film', {3, 4})]
         """
+        # open file and read lines
+        bm = dict()
         with open(file_name, "r") as file:
             for line in file:
-                h1 = line.split("\t")
-                h1[0] = h1[0].lower().strip()
-                h1[1] = tuple([x.strip() for x in h1[1].split(" ")])
-                self.records.append(tuple(h1))
+                # create a dict containig a set with the ids as second
+                # place
+                h = line.split("\t")
+                h[0] = h[0].lower().strip()
+                h[1] = set([int(x.strip()) for x in h[1].split(" ")])
+                bm[h[0]] = h[1]
+        return bm
 
     def evaluate(self, ii, benchmark, use_refinements=False, verbose=True):
         """
@@ -57,8 +59,22 @@ class Evaluate:
         >>> [round(x, 3) for x in measures]
         [0.667, 0.833, 0.694]
         """
+        pk = pr = ap = 0
+        c = 0
+        # test each benchmark
+        for b_qu  in benchmark:
+            # query records 
+            iil = ii.process_query(b_qu)
+            iil_id = [x for x, y in iil]
+            # compute p@k
+            pk += self.precision_at_k(iil_id, benchmark[b_qu], 3)
+            pr += self.precision_at_k(iil_id, benchmark[b_qu],
+            len(benchmark[b_qu]))
+            ap += self.average_precision(iil_id, benchmark[b_qu])
 
-        pass  # TODO: add your code
+            c += 1
+        # mp@3, mp@r, map
+        return [pk / c, pr / c, ap / c]
 
     def precision_at_k(self, result_ids, relevant_ids, k):
         """
@@ -77,6 +93,22 @@ class Evaluate:
         >>> evaluator.precision_at_k([5, 3, 6, 1, 2], {1, 2, 5, 6, 7, 8}, k=8)
         0.5
         """
+        if k == 0:
+            return 0
+
+        if k > len(result_ids):
+            # iterate only till list end
+            ki = len(result_ids)
+        else:
+            ki = k
+
+        # check if result_ids are in the set of relevant_ids 
+        hits = 0
+        for r_id in range(0, ki):
+            if result_ids[r_id] in relevant_ids:
+                # count hits
+                hits += 1
+        return hits / k 
 
     def average_precision(self, result_ids, relevant_ids):
         """
@@ -91,8 +123,15 @@ class Evaluate:
         >>> evaluator.average_precision([7, 17, 9, 42, 5], {5, 7, 12, 42})
         0.525
         """
-
-        pass  # TODO: add your code
+        # counter for computing
+        ap = hits = total = 0
+        for r_id in result_ids:
+            total += 1
+            if r_id in relevant_ids:
+                # count hit, sum percent values
+                hits += 1
+                ap += hits / total
+        return ap / len(relevant_ids)
 
 
 if __name__ == "__main__":
@@ -101,6 +140,20 @@ if __name__ == "__main__":
         print("""Usage: python3 evaluate.py """
               """<file> <benchmark> [<b>] [<k>]""")
         sys.exit()
-    
+    # check skaling parameter
+    if len(sys.argv) < 4:
+        b = 0
+    elif len(sys.argv) < 5:
+        b = argv[3]
+        k = 0
+    else:
+        b = argv[3]
+        k = argv[4]
+
+    # inverted index
+    ii = InvertedIndex()
+    ii.build_from_file(sys.argv[1], b=0.75, k=1.75)
+    # evaluation
     ev = Evaluate()
-    ev.read_benchmark(sys.argv[1])
+    bm = ev.read_benchmark(sys.argv[2])
+    print(ev.evaluate(ii, bm))

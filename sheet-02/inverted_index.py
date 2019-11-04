@@ -6,7 +6,6 @@ Hannah Bast <bast@cs.uni-freiburg.de>
 Claudius Korzen <korzen@cs.uni-freiburg.de>
 Patrick Brosi <brosi@cs.uni-freiburg.de>
 """
-from __future__ import division
 import readline  # NOQA
 import re
 import sys
@@ -150,10 +149,10 @@ class InvertedIndex:
         l1 = l2 = 0
         while l1 < len(list1) and l2 < len(list2):
             if list1[l1][0] < list2[l2][0]:
-                merged.append(list1[l1])
+                merged.append(tuple(list1[l1]))
                 l1 += 1
             elif list1[l1][0] > list2[l2][0]:
-                merged.append(list2[l2])
+                merged.append(tuple(list2[l2]))
                 l2 += 1
             else: # sum the bm25 value and add to the record
                 merged.append((list1[l1][0], list1[l1][1] + list2[l2][1]))

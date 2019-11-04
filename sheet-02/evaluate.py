@@ -62,14 +62,14 @@ class Evaluate:
         pk = pr = ap = 0
         c = 0
         # test each benchmark
-        for b_qu  in benchmark:
-            # query records 
+        for b_qu in benchmark:
+            # query records
             iil = ii.process_query(b_qu)
             iil_id = [x for x, y in iil]
             # compute p@k
             pk += self.precision_at_k(iil_id, benchmark[b_qu], 3)
             pr += self.precision_at_k(iil_id, benchmark[b_qu],
-            len(benchmark[b_qu]))
+                                      len(benchmark[b_qu]))
             ap += self.average_precision(iil_id, benchmark[b_qu])
 
             c += 1
@@ -102,13 +102,13 @@ class Evaluate:
         else:
             ki = k
 
-        # check if result_ids are in the set of relevant_ids 
+        # check if result_ids are in the set of relevant_ids
         hits = 0
         for r_id in range(0, ki):
             if result_ids[r_id] in relevant_ids:
                 # count hits
                 hits += 1
-        return hits / k 
+        return hits / k
 
     def average_precision(self, result_ids, relevant_ids):
         """
@@ -144,11 +144,11 @@ if __name__ == "__main__":
     if len(sys.argv) < 4:
         b = 0
     elif len(sys.argv) < 5:
-        b = argv[3]
+        b = sys.argv[3]
         k = 0
     else:
-        b = argv[3]
-        k = argv[4]
+        b = sys.argv[3]
+        k = sys.argv[4]
 
     # inverted index
     ii = InvertedIndex()

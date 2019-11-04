@@ -82,10 +82,10 @@ class InvertedIndex:
                 line = line.strip()
 
                 record_id += 1
-               
+
                 # Store the record as a tuple (title, description).
                 self.records.append(tuple(line.split("\t")))
-                
+
                 for word in re.split("[^A-Za-z]+", line):
                     word = word.lower().strip()
 
@@ -93,20 +93,21 @@ class InvertedIndex:
                     if len(word) == 0:
                         continue
                     dl += 1
-                    
+
                     if word not in self.inverted_lists:
                         # The word is seen for first time, create a new list.
                         self.inverted_lists[word] = [[record_id, 1]]
                     elif self.inverted_lists[word][-1][0] != record_id:
                         # Make sure that the list contains the id at most once.
                         self.inverted_lists[word].append([record_id, 1])
-                    else: # count the occurence of the word in the record (tf)
-                        self.inverted_lists[word][-1][1] = self.inverted_lists[word][-1][1] + 1 
-                        
+                    else:  # count the occurence of the word in the record (tf)
+                        self.inverted_lists[word][-1][1] = \
+                            self.inverted_lists[word][-1][1] + 1
+
                 # counter for average
                 dll.append(dl)
                 dl = 0
-                
+
             avdl = sum(dll) / record_id
             for iil in self.inverted_lists.values():
                 for ii in iil:
@@ -114,7 +115,8 @@ class InvertedIndex:
                     if math.isinf(k):
                         helper = ii[1]
                     else:
-                        helper = ii[1] * (k + 1) / (k * (1 - b + b * dll[ii[0]-1] / avdl) + ii[1]) 
+                        helper = ii[1] * (k + 1) / \
+                            (k * (1 - b + b * dll[ii[0]-1] / avdl) + ii[1])
                     ii[1] = helper * math.log2(record_id / len(iil))
 
     def merge(self, list1, list2):
@@ -154,11 +156,11 @@ class InvertedIndex:
             elif list1[l1][0] > list2[l2][0]:
                 merged.append(tuple(list2[l2]))
                 l2 += 1
-            else: # sum the bm25 value and add to the record
+            else:  # sum the bm25 value and add to the record
                 merged.append((list1[l1][0], list1[l1][1] + list2[l2][1]))
                 l1 += 1
                 l2 += 1
-        
+
         # merge ends
         if l1 < len(list1):
             for x in list1[l1:len(list1)]:
@@ -226,4 +228,4 @@ if __name__ == "__main__":
         print(res)
         # Print lines of the first three results.
         for index, bm25 in res:
-            print(ii.records[index -1])
+            print(ii.records[index - 1])

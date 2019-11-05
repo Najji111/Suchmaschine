@@ -9,6 +9,7 @@ Patrick Brosi <brosi@cs.uni-freiburg.de>
 import readline  # NOQA
 import re
 import sys
+import math
 
 
 class InvertedIndex:
@@ -20,9 +21,6 @@ class InvertedIndex:
         """
         Creates an empty inverted index.
         """
-
-        # TODO: add your code
-        self.documents = {}
 
         self.inverted_lists = {}  # The inverted lists of record ids.
         self.records = []  # The records, each in form (title, description).
@@ -78,12 +76,13 @@ class InvertedIndex:
 
         with open(file_name, "r") as file:
             record_id = 0
+            lines = []
 
             for line in file:
                 line = line.strip()
 
                 record_id += 1
-
+                DL = 0
                 # Store the record as a tuple (title, description).
                 self.records.append(tuple(line.split("\t")))
 
@@ -93,14 +92,33 @@ class InvertedIndex:
                     # Ignore the word if it is empty.
                     if len(word) == 0:
                         continue
+                    DL += 1
                     if word not in self.inverted_lists:
                         # The word is seen for first time, create a new list.
-                        self.inverted_lists[word] = [record_id]
-                    elif self.inverted_lists[word][-1] != record_id:
+                        self.inverted_lists[word] = [[record_id, 1]]
+                    elif self.inverted_lists[word][-1][0] != record_id:
                         # Make sure that the list contains the id at most once.
-                        self.inverted_lists[word].append(record_id)
+                        self.inverted_lists[word].append([record_id, 1])
+                    else:
+                        # add tf
+                        self.inverted_lists[word][-1][1] += 1
+                lines.append(DL)
+            AVDL = sum(lines) / record_id
 
         # TODO: add your code to compute BM25 scores
+        N = record_id
+        for a in self.inverted_lists:
+            df = len(self.inverted_lists[a])
+            for i in self.inverted_lists[a]:
+                if k == float("inf"):
+                    tf = i[1]
+                    tf_ = tf
+                else:
+                    tf = i[1]
+                    DL = lines[i[0]-1]
+                    tf_ = tf * (k+1) / (k * (1 - b + b * DL/AVDL) + tf)
+                BM_25 = tf_ * math.log2(N/df)
+                i[1] = BM_25
 
     def merge(self, list1, list2):
         """
@@ -133,7 +151,7 @@ class InvertedIndex:
 
         pass  # TODO: add your code
 
-        result = [] # from tupels
+        result = []  # from tupels
         i = j = 0
         while (i < len(list1) and j < len(list2)):
             if list1[i][0] == list2[j][0]:
@@ -153,7 +171,6 @@ class InvertedIndex:
             else:
                 result += (list1[i:])
         return result
-
 
     def process_query(self, keywords, use_refinements=False):
         """
@@ -179,6 +196,24 @@ class InvertedIndex:
         """
 
         pass  # TODO: add your code
+        result = []
+
+        # Convert a string to list
+        if not isinstance(keywords, list):
+            keywords = list(keywords.split(" "))
+        # Search the inverdex index for each word and computed the results.
+        for word in keywords:
+            word = word.lower().strip()
+            if self.inverted_lists.get(word) is None:
+                continue
+            elif len(result) == 0:
+                result = self.inverted_lists[word]
+                continue
+            # intersect last result with current
+            result = self.merge(result, self.inverted_lists[word])
+            result.sort(key=lambda x: x[1], reverse=True)
+
+        return result
 
 
 if __name__ == "__main__":
@@ -186,5 +221,13 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python3 inverted_index.py <file> [<b>] [<k>]")
         sys.exit()
-
-    pass  # TODO: add your code
+    ii = InvertedIndex()
+    ii.read_from_file(sys.argv[1], b=0.75, k=1.75)
+    res = []
+    while True:
+        word = str(input("Query: "))
+        res = ii.process_query(word)
+        print(res)
+        # Print lines of the first three results.
+        for index, bm25 in res:
+            print(ii.records[index - 1])

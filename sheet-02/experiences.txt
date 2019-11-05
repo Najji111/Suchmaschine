@@ -1,0 +1,5 @@
+experience with tuning:
+	Changing the querys is easy, but getting a better result is really hard. Some changes can make it worse. that, to understand, was not every time easy. Facing a large number of query, makes it hard to find a all fitting solution.
+
+experience with exercise:
+	To get the task done, i did the follow: I locked at the test to get an impression, what type of the function paramters are (Dict with a n-tuple or list with a 2-tupe, containing a set or ...). That time could be better invested. The same goes for the type of the return value. And in the end if everything needs to fit together, some mistakes cum up, because of that. Please define the types in the exersice. The rest of the exersices was nice to do.

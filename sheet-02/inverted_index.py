@@ -25,6 +25,11 @@ class InvertedIndex:
         self.inverted_lists = {}  # The inverted lists of record ids.
         self.records = []  # The records, each in form (title, description).
 
+        # synonym
+        self.l1 = ["directed", "director", "direct", "managed"]
+        self.l2 = tuple(["oscar", "academy", "award"])
+        self.lsum = [self.l1, self.l2]
+
     def build_from_file(self, file_name, b=None, k=None):
         """
         Construct the inverted index from the given file. The expected format
@@ -196,9 +201,18 @@ class InvertedIndex:
         # Convert a string to list
         if not isinstance(keywords, list):
             keywords = list(keywords.split(" "))
+
+        b_l1 = False
+        for word in keywords:
+            word = word.lower().strip()
+            if not b_l1 and word in self.l1:
+                keywords.extend(self.l1)
+                b_l1 = True
+
         # Search the inverdex index for each word and computed the results.
         for word in keywords:
             word = word.lower().strip()
+
             if self.inverted_lists.get(word) is None:
                 continue
             elif len(res) == 0:

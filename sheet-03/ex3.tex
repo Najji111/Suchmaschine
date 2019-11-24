@@ -1,0 +1,122 @@
+% Template: Fabian Wenzelmann, 2016 - 2019
+\documentclass[a4paper,
+twoside, % to have to sided mode
+headlines=2.1 % number of lines in the heading, increase if you want more
+]{scrartcl}
+\usepackage[
+margin=2cm,
+includefoot,
+footskip=35pt,
+includeheadfoot,
+headsep=0.5cm,
+]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage[automark,headsepline]{scrlayer-scrpage}
+\usepackage{enumerate}
+\usepackage[protrusion=true,expansion=true,kerning]{microtype}
+\usepackage{tabto}
+% only required for the example
+\usepackage{lipsum}
+
+\newcommand{\yourname}{Najji Hendo \and Armin Saur}
+\newcommand{\headingname}{Najji Hendo, Armin Saur}
+\newcommand{\lecture}{Information Retrieval}
+\newcommand{\sheetnum}{3}
+\author{\yourname}
+\title{\lecture}
+\subtitle{Exercise Sheet \sheetnum}
+
+\pagestyle{scrheadings}
+\setkomafont{pagehead}{\normalfont}
+\lohead{\lecture\\\headingname}
+\lehead{\lecture\\\headingname}
+\rohead{Exercise Sheet \sheetnum}
+\rehead{Exercise Sheet \sheetnum}
+
+
+\begin{document}
+\maketitle
+\section*{Exercise 1}
+Proof $\Theta(\log_2 d_i \forall i$ for galloping-search.
+
+The number of exponential  steps is $\log_2 di$, because:\\
+For computing upper border applies $j' \geq j_i$, $j' = 2^{\lceil\log_2 d_{j'}\rceil}$.\\
+$O_{exp}(\log_2 d_i) = \begin{cases}
+d_i > d_{j'} & or\\
+d_i = d_{j_i}
+\end{cases}$\\
+So the exponential search for $B[j_i]$ is over the distance $d_{j'}$, so it always needs the same number of steps.\\
+
+The binary search for the complete distance $d_i$ is always overt the area of $d_{j'}$, which is, like the exponential search, in $O_{bin}(\log_2 d_i)$. If $d_i = d_{j'}$ the binary search is not needed.\\
+$\Theta(log_2 d_i) = \begin{cases} O(\log_2 d_i) & \text{full exponential and binary search}\\ 
+\Omega(\log_2 d_i) & \text{only exonential search}
+\end{cases}$ 
+
+
+\section*{Exercise 2}
+% \begin{align*}
+\begin{itemize} 
+\item Proof why
+$\mathcal{O}(\sum\limits_{i=1}^{k} log_2 d_i )$ ist not correct  unsing counterexample:
+\\
+when the gaps are always one then $d_i = 1$
+\begin{center}
+$ \Longrightarrow \mathcal{O}(\sum\limits_{i=1}^{k} \log_{2}{d_i} ) = \mathcal{O}(\sum\limits_{i=1}^{k} \log_{2}{1} )= 0 $.
+\end{center}
+and the time complexity cannot be 0.
+\\
+\\
+\noindent
+\item Proof
+$\mathcal{O}(k . \sum\limits_{i=1}^{k} \log_{2}{(n/k)} )$ ist not correct unsing counterexample:
+\\
+When  ($len(A) = len(B)) \Longrightarrow k = n$
+\begin{center}
+$ \Longrightarrow \mathcal{O}(k.\sum\limits_{i=1}^{k} \log_{2}{(n/k)} ) = \mathcal{O}(k.\sum\limits_{i=1}^{k} \log_{2}{1} )= 0 $.
+\end{center}
+and the time complexity cannot be 0.
+
+\end{itemize}
+
+\newpage
+
+\section*{Exercise 3}
+
+\newcommand{\RN}[1]{%
+\textup{\uppercase\expandafter{\romannumeral#1}}%
+}
+$k.\log_{2}{(1+n/k)} \leq k +n$
+\\ 
+constraint := $k.\log_{2}{(1+n/k)}  -k -n = 0$
+\\ 
+\begin{center}
+$\Longrightarrow L:= k.\log_{2}{(1+n/k)} + \lambda(k+n)$ \\
+$ = k.\log_{2}{(1+n/k)} +\lambda k + \lambda n$ 
+\end{center}
+\begin{itemize}
+\item $\frac{\partial L}{\partial k} =  \log_{2}{(1+n/k)} + k \frac{-n}{k^{2}} . \frac{1}{1 + \frac{n}{k}}+ \lambda $ \tab\tab $(\RN{1})$\\
+
+\item $\frac{\partial L}{\partial n} =  \frac{k}{k^{2}} . k \frac{1}{1+ \frac{n}{k}} + \lambda = \frac{1}{1+ \frac{n}{k}} + \lambda $ \tab\tab $(\RN{2})$\\
+
+\item $\frac{\partial L}{\partial \lambda} =  -k-n$ \tab\tab $(\RN{3})$ \\
+\end{itemize}
+from $(\RN{1}) \Longrightarrow$ $ \lambda =  - \log_{2}{(1+n/k)} + \frac{n}{k} . \frac{1}{1 + \frac{n}{k}} $
+\newline
+from $(\RN{2}) \Longrightarrow$ $ \lambda =  \frac{-1}{1 + \frac{n}{k}} $
+\newline
+
+\begin{center}
+from $(\RN{1}) $ and $ (\RN{2})$:
+\\ $ - \log_{2}{(1+n/k)} + \frac{n}{k} . \frac{1}{1 + \frac{n}{k}} $ = $\frac{-1}{1 + \frac{n}{k}} $
+\\
+$ - \log_{2}{(1+n/k)} + \frac{n}{k + n} $ = $\frac{-1}{1 + \frac{n}{k}} $
+
+\end{center}
+
+\end{document}

@@ -1,0 +1,96 @@
+% Template: Fabian Wenzelmann, 2016 - 2019
+\documentclass[a4paper,
+  twoside, % to have to sided mode
+  headlines=2.1 % number of lines in the heading, increase if you want more
+  ]{scrartcl}
+\usepackage[
+  margin=2cm,
+  includefoot,
+  footskip=35pt,
+  includeheadfoot,
+  headsep=0.5cm,
+]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{mathtools}
+\usepackage{amssymb}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage[automark,headsepline]{scrlayer-scrpage}
+\usepackage{enumerate}
+% roman letters
+\usepackage{enumitem}
+\usepackage[protrusion=true,expansion=true,kerning]{microtype}
+
+% display roman numbers
+\makeatletter
+\newcommand*{\rom}[1]{\expandafter\@slowromancap\romannumeral #1@}
+\makeatother
+
+% only required for the example
+\usepackage{lipsum}
+
+\newcommand{\yourname}{Najji Hendo \and Armin Saur}
+\newcommand{\headingname}{Najji Hendo, Armin Saur}
+\newcommand{\lecture}{Information Retrieval}
+\newcommand{\sheetnum}{4}
+\author{\yourname}
+\title{\lecture}
+\subtitle{Exercise Sheet \sheetnum}
+
+\pagestyle{scrheadings}
+\setkomafont{pagehead}{\normalfont}
+\lohead{\lecture\\\headingname}
+\lehead{\lecture\\\headingname}
+\rohead{Exercise Sheet \sheetnum}
+\rehead{Exercise Sheet \sheetnum}
+
+
+\begin{document}
+\maketitle
+\section*{Exercise 1}
+Show that the first of \textit{Shannons source coding theorem} $E\ L(X) \geq H(X)$, where $X=\{1, ..., m\}$, $H(X)=-\sum_i^m p_i \cdot \log_2 p_i$ and $E\ L(X)=\sum_i^m p_i \cdot L_i$.\\
+
+Under the second \textit{central lemma} constraint $\sum_i^m 2^{-L_i} \leq 1 \Rightarrow L_i$ is prefix-free code (PF) with length $L_i$.\\
+For proofing the upper constraint we need to minimize $E\ L(X)$ and can use the \textit{central lemma}. In that case $L_i$ is a PF.\\
+
+
+Using the Lagrange multiplication is $E\ L(X)$ the constraint and $\sum_i^m 2^{-L_i} = s \leq 1 \iff \sum_i^m 2^{-L_i} - s = 0$ the condition.  This results in the following equation: $\mathcal{L} = \sum_i^m p_i \cdot L_i - \lambda (\sum_i^m 2^{-L_i} - s)$.
+
+\begin{enumerate}[label=\Roman*, itemsep=-1em]
+    \item $\frac{\partial \mathcal{L}}{\partial p_i} = L_i  = 0$\\
+    \item $\frac{\partial \mathcal{L}}{\partial L_i} = p_i + \lambda \cdot 2^{-L_i}= 0 \iff L_i = - \log_2 (\frac{-p_i}{\lambda})$\\
+    \item $\frac{\partial \mathcal{L}}{\partial \lambda} = \sum_i^m 2^{-L_i} - s = 0 \iff s = \sum_i^m 2^{-L_i}$
+\end{enumerate}
+In \rom{1} is $L_i = 0$, but a code with no length is not possible with a $i \in X$.\\
+\\
+\textbf{\rom{2} in \rom{3}}\\
+$s = \sum_i^m 2^{(\log_2 \frac{-p_i}{\lambda})} = \sum_i^m \frac{-p_i}{\lambda} =  \frac{1}{-\lambda} \cdot \sum_i^m p_i = \frac{1}{-\lambda} \cdot 1 \iff$\\
+$\lambda = \frac{1}{-s}$\\
+\\
+\textbf{$s$ in \rom{2}}\\
+$L_i = \log_2 (\frac{\frac{1}{s}}{p_i}) L_i = - \log_2 (s \cdot p_i), \forall i$\\
+\\
+\textbf{Is $L_i = -\log_2 (s \cdot p_i)$ a minimum?}\\
+For $s \leq 1$ is the maximum value $s = 1$. Let $L_i = 3$. If $s \cdot p_i = 1$ and $p_i = 1$ then all $i$ are equal and the optimal code length must be $L_i = 0$.\\
+$L_i = -\log_2 1 = 0$ So $L_i = 3$ isn't an optimum.
+$L_i = -\log_2 (s \cdot p_i)$ is a minimum.\\
+\\
+\textbf{Show $E\ L(X) \geq H(X)$}:\\
+Let $s=1$ be its maximum value.\\
+$E\ L(X) = - \sum_i^m p_i \cdot \log_2 (1 \cdot p_i) = H(X)$\\
+For $s<1, E\ L(X) < H(X)$ qed
+
+\section*{Exersice 2}
+Show that \textit{Golomb} is \textit{entropy-optimal}.\\
+A code is optimal for $p_i \Rightarrow L_i \leq \log_2 \frac{1}{p_i} + O(1)$, with $p_i = (1-p)^{i-1} \cdot p$, $p < 1$ and $L_i = \lfloor \frac{i}{M} \rfloor + 1 + \lceil \log_2 M \rceil$.\\
+Let $i = 1$ than $p_i = p$ and for all $i >1$ is $p_i < p$, so $p_i \leq p \iff \frac{1}{p} \leq \frac{1}{p_i}$, $\forall i$.\\
+$M = \lceil \frac{1}{p} \cdot \ln 2 \rceil \leq \lceil \frac{1}{p} \cdot 1 \rceil  = M'$ \\
+$L_i \leq \lfloor \frac{i}{M'} \rfloor + 1 + \lceil \log_2 M' \rceil \leq \frac{i}{M'} + 1 + \lceil \log_2 M' \rceil \leq \frac{i}{\lceil \frac{1}{p} \rceil} + \log_2 (\lceil \frac{1}{p} \rceil) + 1 \leq \frac{i}{\frac{1}{p} + 1}\log_2 (\frac{1}{p}) + 2$\\
+
+
+
+
+\end{document}
+

@@ -1,0 +1,9 @@
+Experience: Using the Lagrange for exercise 2 was not easy. We could't find the right condition. The same goes for exercise 3.
+Invested time for the sheet was 9h.
+
+We hope to see more explanations at the sheet which can really help as to understand how to proof und how to process our solutions.
+It will be much better if we get programming exercises and theory one at the same sheet, so that we understand more using programming.  
+
+for the question "Why do most computer scientists have terrible handwriting?"
+i think this theory could be right if we change ("computer scientists" to "doctors") :)
+ 

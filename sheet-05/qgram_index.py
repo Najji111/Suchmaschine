@@ -9,16 +9,11 @@ Patrick Brosi <brosi@cs.uni-freiburg.de>
 import time
 import readline  # NOQA
 import sys
-import ped_c
 
 # Uncomment to use C version of prefix edit distance calculation.
 # You have to install the module using the provided ped_c/setup.py
 # first.
-# from ped_c import ped
-
-# Comment to use C version of prefix edit distance calculation
-from ped_python import ped
-
+from ped_c import ped
 
 class QGramIndex:
     """
@@ -35,11 +30,12 @@ class QGramIndex:
         self.padding = "$" * (q - 1)
         self.entity_name = []
         self.entity_score = []
-        
+        self.entity_left = []
+
         # monetoring
-        self.time = 0
         self.num_merg = 0
         self.num_res = 0
+        self.num_ped = 0
 
     def build_from_file(self, file_name):
         '''
@@ -76,12 +72,14 @@ class QGramIndex:
                     first_line = False
                     continue
 
+                entity_id += 1
                 # split entity
                 e_name, e_score, rest_of_line = line.strip().split("\t", 2)
                 e_name = e_name.lower()
                 self.entity_name.append(e_name)
                 self.entity_score.append(int(e_score))
-                entity_id += 1
+                self.entity_left.append(rest_of_line)
+
 
                 for qgram in self.compute_qgrams(e_name):
                     h = self.inverted_lists
@@ -144,6 +142,9 @@ class QGramIndex:
         >>> qi.merge_lists([[], []])
         []
         '''
+        if len(lists) == 0:
+            return []
+
         res = lists[0]
         for l in lists[1:]:
             h = []
@@ -196,7 +197,7 @@ class QGramIndex:
         [(1, 2, 3)]
         '''
         # monitoring
-        self.time_s = time.monotonic()
+        self.num_ped = 0
 
         qg_pre = self.compute_qgrams(prefix)
         
@@ -215,12 +216,14 @@ class QGramIndex:
         for qg in qg_match:
             # only enterys with high freq
             if qg[1] >= min_freq:
-                pref_ped = ped(prefix, self.entity_name[qg[0] - 1], delta)
+                entity_norml = self.normalize(self.entity_name[qg[0] -1])
+                self.num_ped += 1
+                pref_ped = ped(prefix, entity_norml, int(delta))
+                
                 if pref_ped <= delta:
                     # (entity_id, ped_val, entity_score
                     res.append((qg[0], pref_ped, self.entity_score[qg[0] - 1]))
         # monitoring
-        self.time = time.monotonic() - self.time
         self.num_res = len(res)
        
         return res
@@ -252,8 +255,10 @@ if __name__ == "__main__":
     file_name = sys.argv[1]
      
     qg = QGramIndex(3)
+    time1 = time.monotonic()
     qg.build_from_file(file_name)
-    
+    time1 = time.monotonic() - time1
+    print("%f" % (time1 * 1000))    
     while True:
         # read input
         query = str(input("Query: "))
@@ -261,8 +266,17 @@ if __name__ == "__main__":
        
         # compute match
         delta = len(query_n) / 4 - len(query_n) % 4 / 4
+        time1 = time.monotonic()
         res = qg.find_matches(query_n, delta)
+        time1 = time.monotonic() - time1
         res = qg.rank_matches(res)
-        print(res)
-        print("r-time: %s,\tmerges: %s,\t#res_lists: %s" % (qg.time,
-        qg.num_merg, qg.num_res))
+        
+        print("result for %s is" % (query))
+        for i in range(0, len(res)):
+            if i > 4 :
+                break
+        #    print(res)
+            print(qg.entity_name[res[i][0] - 1], qg.entity_score[res[i][0] - 1],
+            qg.entity_left[res[i][0] - 1], "\n")
+        print("r-time: %f,\tmerges: %d,\t#res: %d,\t#ped: %d" % (time1 * 1000,
+        qg.num_merg, qg.num_res, qg.num_ped))

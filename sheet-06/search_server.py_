@@ -7,7 +7,7 @@ Author: Hannah Bast <bast@cs.uni-freiburg.de>
 import socket
 import sys
 from qgram_index import QGramIndex
-
+import re
 
 class SearchServer:
     """
@@ -79,7 +79,7 @@ class SearchServer:
         self.port = port
         self.max_num_byte = 1024
 
-    def qgram_build_from_file(self, file_name, q=3, use_syns=False):
+    def qgram_build_from_file(self, file_name, q = 3, use_syns = False):
         """ build qgram index from file.
 
         >>> ss = SearchServer(8080)
@@ -89,41 +89,46 @@ class SearchServer:
         [('$$b', [(2, 1)]), ('$$f', [(1, 1)]), ('$br', [(2, 1)]),
          ('$fr', [(1, 1)]), ('bre', [(2, 1)]), ('fre', [(1, 1)]),
          ('rei', [(1, 1), (2, 1)])]
-        """
+        """   
 
-        self.qg = QGramIndex(q, use_syns)
+        self.qg = QGramIndex(q, use_syns)    
         self.qg.build_from_file(file_name)
 
     def handle_query(self, query):
         """ compute query
-
+        
         >>> ss = SearchServer(8080)
-        >>> ss.qgram_build_from_file("test.tsv")
-        >>> print(ss.handle_query("frei").decode("utf-8"))
+        >>> ss.qgram_build_from_file("wikidata-entities.100k.tsv")
+        >>> print(ss.handle_query("angela").decode("utf-8"))
         ... # doctest: +NORMALIZE_WHITESPACE
-        <p><b>frei</b> score=3 : a word
-         <a href="url2">(See)</a></p>
-        <p><b>brei</b> score=2 : another word
-         <a href="url2">(See)</a></p>
+        <p><b>Angela Merkel</b> score=180 : Chancellor of German 
+         <a href="https://en.wikipedia.org/wiki/Angela_Merkel">(See)</a></p>
+        <p><b>Angela Lansbury</b> score=50 : British-American actress and singe 
+         <a href="https://en.wikipedia.org/wiki/Angela_Lansbury">(See)</a></p>
+        <p><b>Angela Davis</b> score=49 : American political activist, scholar, and autho 
+         <a href="https://en.wikipedia.org/wiki/Angela_Davis">(See)</a></p>
+        <p><b>Angela Bassett</b> score=38 : American actres <a href="https://en.wikipedia.org/wiki/Angela_Bassett">(See)</a></p>
+        <p><b>Angola</b> score=243 : country in Afric 
+        <a href="https://en.wikipedia.org/wiki/Angola">(See)</a></p>
         """
 
         res = self.qg.normalize(query)
         res = self.qg.find_matches(res, int(len(res) / 4))
-
-        res_top = ""
+       
+        res_top = "" 
         for ent in self.qg.rank_matches(res)[:5]:
-            # top 5 result
+            # top 5 results
             res_top += "<p>" + ("<b>%s</b> score=%s : %s <a \
-            href=\"%s\">(See)</a>" % (
-                self.qg.entities[ent[0] - 1][0],  ent[2],
-                self.qg.entities[ent[0] - 1][2],
-                self.qg.entities[ent[0] - 1][3])) + "</p> "
+            href=\"%s\">(See)</a>"% (
+                self.qg.entities[ent[0] - 1][0],  ent[2], 
+                self.qg.entities[ent[0] - 1][2][:-1], self.qg.entities[ent[0] -
+                1][3])) + "</p> " 
 
         return res_top.encode("utf-8")
 
-    def handle_http(self, code, content="", c_type="text/html"):
-        """ creat header for html text messages.
-
+    def handle_http(self, code, content = "", c_type = "text/html"):
+        """ creat header for html text messages. 
+        
         >>> ss = SearchServer(8080)
         >>> print(ss.handle_http(200, b"Hello Wold").decode("utf-8"))
         ... # doctest: +NORMALIZE_WHITESPACE
@@ -143,7 +148,7 @@ class SearchServer:
 
         # code and msg
         if code == 200:
-            code_msg = "OK"
+           code_msg = "OK" 
         if code == 403:
             code_msg = "Forbidden"
         if code == 404:
@@ -159,12 +164,13 @@ class SearchServer:
             "Content-Type: %s\r\n" \
             "\r\n" \
             % (code, code_msg, len(content), c_type)
-
+        
         return header.encode("utf-8") + content
+
 
     def run(self):
         """ Run the server loop: create a socket, and then, in an infinite loop,
-        wait for requsts and do something with them. """
+        wait for requsts and do something with them. """ 
 
         # Create server socket using IPv4 addresses and TCP.
         server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -181,24 +187,19 @@ class SearchServer:
             print("waiting for connection...")
             sys.stdout.flush()
             con, client = server_socket.accept()
-
+            
             # read request
             requ_b = con.recv(self.max_num_byte)
-            requ = requ_b.decode("utf-8")
-
+            requ = requ_b.decode("utf-8")  
+            
             if requ.startswith("GET "):
                 # parse request
-                # expected input: GET /search.html[?q=<qury>] HTTP/1.1
-                requ_query = requ[5:].split(" HTTP/1.1\r\n", 1)[0] \
-                    .split("?q=", 1)
-
-                if requ_query[0].find("tee") > 0:
-                    con.sendall(self.handle_http(418))
-                    con.close()
-                    continue
-
+                #expected input: GET /search.html[?q=<qury>] HTTP/1.1
+                requ_query = requ[5:].split(" HTTP/1.1\r\n", 1)[0].split("?q=",1)
+                    
                 if requ_query[0].find("/") > 0:
                     # Permission denied
+                   
                     # send response and colse connection
                     con.sendall(self.handle_http(403))
                     con.close()
@@ -207,40 +208,41 @@ class SearchServer:
                 try:
                     # response with file content
                     with open(requ_query[0], "rb") as f:
-                        resp = f.read()
-                except OSError:
+                        resp = f.read() 
+                except:
                     con.sendall(self.handle_http(404))
                     con.close()
                     continue
+
 
                 if len(requ_query) > 1:
                     # handle query
                     res = self.handle_query(requ_query[1])
                     # show query and results
                     resp = resp.replace(b"%query%",
-                                        requ_query[1].encode("utf-8"))
+                    requ_query[1].encode("utf-8"))
                     resp = resp.replace(b"%result%", res)
                 else:
                     # nothing to handle
                     resp = resp.replace(b"%query%", b"")
                     resp = resp.replace(b"%result%", b"")
 
+
                 # content type
                 if requ_query[0].endswith(".css"):
                     c_type = "text/css"
                 elif requ_query[0].endswith(".html"):
-                    c_type = "text/html"
-
-                # send resp
+                    c_type = "text/html" 
+                    
+                # send resp            
                 con.sendall(self.handle_http(200, resp, c_type))
                 con.close()
-
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         print("Usage: python3 %s <file> <port> [--use-synonyms]" % sys.argv[0])
         sys.exit(1)
-
+    
     use_syns = len(sys.argv) > 3
     port = int(sys.argv[2])
     server = SearchServer(port)

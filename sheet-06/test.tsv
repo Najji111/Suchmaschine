@@ -1,3 +1,3 @@
-name	score	description
-frei	3	a word
-brei	2	another word
+name	score	description	url	id	syn	img
+frei	3	a word	url2	1	free	img1
+brei	2	another word	url2	2	schleim	img2

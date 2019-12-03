@@ -15,7 +15,7 @@ import time
 from ped_c import ped
 
 # Comment to use C version of prefix edit distance calculation
-#from ped_python import ped
+# from ped_python import ped
 
 
 class QGramIndex:

@@ -1,0 +1,99 @@
+body {
+  font-family: "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background-color: #eee;
+  color: #333;
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 1em;
+}
+
+/* ========================================================================= */
+
+.header {
+  text-align: center;
+}
+
+.header #logo {
+  width: 250px;
+  margin-bottom: 10px;
+}
+
+.header #subtitle {
+  font-size: 20px;
+  font-weight: 100;
+  color: #666;
+  letter-spacing: -0.02em;
+  margin: 0px 0px 20px 0px;
+}
+
+/* ========================================================================= */
+
+.search {
+  text-align: center;
+  padding: 1em;
+}
+
+.search input {
+  font-family: "Raleway", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  padding: .5em .6em;
+  display: inline-block;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 1px 3px #ddd;
+  vertical-align: middle;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+
+.search #field {
+  width: 350px;
+}
+
+.search #button {
+  height: 37px;
+  width: 80px;
+}
+
+/* ========================================================================= */
+
+.result #result-header {
+  font-size: 16px;
+  text-align: center;
+  color: #666;
+  padding: 0px 0px 15px 0px;
+}
+
+.result #result-body .entity {
+  padding: 10px 0px;
+  border-top: 1px solid #bbb;
+}
+
+.result #result-body .entity .entity-image img {
+  float: left;
+  max-width: 150px;
+  max-height: 100px;
+}
+
+.result #result-body .entity .entity-metadata {
+  padding: 0px 0px 0px 165px;
+}
+
+.result #result-body .entity .entity-header {
+  margin-bottom: 10px;
+}
+
+.result #result-body .entity .entity-name {
+  font-weight: bold;
+  font-size: 20px;
+}
+
+.result #result-body .entity .entity-synonym {
+  font-style: italic;
+}
+
+.result #result-body .entity .entity-links {
+  margin-top: 30px;
+}
+
+.result #result-body .entity .entity-links img {
+  margin-left: 10px;
+}

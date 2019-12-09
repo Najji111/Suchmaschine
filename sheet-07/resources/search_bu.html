@@ -1,0 +1,23 @@
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="search.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="search.js"></script>
+</head>
+<body>
+    <div class="header">
+        <img id="logo" src="logo.png">
+        <h2 id="subtitle">Fuzzy Prefix Search on Wikidata</h2>
+    </div>
+    <div class="search">
+        <form>
+            <input id="field" type="text" name="q" value="%QUERY%" autofocus/>
+        </form>
+    </div>
+    <div class="result">
+        <div id="result-header">%RESULT_HEADER%</div>
+        <div id="result-body">%RESULT%</div>
+    </div>
+</body>
+</html>

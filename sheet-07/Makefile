@@ -1,0 +1,21 @@
+# FILE = ../../wikidata-entities.tsv
+FILE = ../../wikidata-entities.100k.tsv
+PORT = 8081
+all: compile test checkstyle
+
+compile:
+	cd ped_c && python3 setup.py install --user
+	python3 -m py_compile *.py
+
+test:
+	python3 -m doctest *.py
+
+checkstyle:
+	flake8 *.py
+
+clean:
+	rm -rf __pycache__
+	rm -f *.pyc
+
+start:
+	python3 search_server.py $(FILE) $(PORT)

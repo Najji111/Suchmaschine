@@ -1,5 +1,5 @@
-# FILE = ../../wikidata-entities.tsv
-FILE = ../../wikidata-entities.100k.tsv
+FILE = wikidata-entities.tsv
+# FILE = ../../wikidata-entities.100k.tsv
 PORT = 8081
 all: compile test checkstyle
 

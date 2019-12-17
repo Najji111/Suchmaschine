@@ -1,0 +1,5 @@
+The difference of the old inverted_index and the new one ist huge. The old one is much faster than the new.
+Specially the l2-norme is not way to slow.
+
+Using scipy and numpy is not easy. It is not so intuitive to use. The auto converting is not smooth. 
+But it helps a lot to "fast" implement math operations.

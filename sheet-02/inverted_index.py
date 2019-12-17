@@ -244,4 +244,5 @@ if __name__ == "__main__":
         for i, (index, bm25) in enumerate(res):
             if i > 4:
                 continue
-            print(ii.records[index - 1])
+            print(res[i])
+            #print(ii.records[index - 1])

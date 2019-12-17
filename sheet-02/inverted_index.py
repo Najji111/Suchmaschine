@@ -239,7 +239,9 @@ if __name__ == "__main__":
     while True:
         word = str(input("Query: "))
         res = ii.process_query(word)
-        print(res)
+#        print(res)
         # Print lines of the first three results.
-        for index, bm25 in res:
+        for i, (index, bm25) in enumerate(res):
+            if i > 4:
+                continue
             print(ii.records[index - 1])

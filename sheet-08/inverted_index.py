@@ -190,10 +190,9 @@ class InvertedIndex:
         self.td_matrix = csr_matrix(helper)
         """
     
-        data = []
-        val = numpy.empty(0)
-        row = numpy.empty(0, dtype=int)
-        col = numpy.empty(0, dtype=int)
+        val = [] 
+        row = [] 
+        col = [] 
         
         num_col = 0
         for records_id, (keys, bms) in enumerate(self.inverted_lists.items()):
@@ -204,9 +203,9 @@ class InvertedIndex:
                 
                 # all word occurrence
                 if bm25 != 0:
-                    val = numpy.append(val, bm25)
-                    row = numpy.append(row, records_id)
-                    col = numpy.append(col, doc_id - 1)
+                    val.append(bm25)
+                    row.append(records_id)
+                    col.append(doc_id - 1)
         # convert to csr
         self.td_matrix = csr_matrix((val, (row, col)), shape=(records_id + 1,
         num_col))
@@ -280,105 +279,36 @@ class InvertedIndex:
         [(4, '1.6'), (3, '1.4'), (2, '0.8'), (1, '0.4')]
         """
 
-        print(11111111111)
-        print(self.td_matrix)
         if not keywords:
             return []
 
-        # Fetch the inverted lists for each of the given keywords.
-        lists = []
+        val = []
+        row = []
         for keyword in keywords:
-            if keyword in self.inverted_lists:
-                lists.append(self.inverted_lists[keyword])
+            for ent_id, ent in enumerate(self.inverted_lists.keys()):
+                # Fetch the inverted lists for each of the given keywords.
+                if keyword == ent:
+                    val.append(1)
+                    row.append(ent_id)
 
-        # Compute the union of all inverted lists.
-        if len(lists) == 0:
+        if len(val) == 0:
             return []
 
-        union = lists[0]
-        #for i in range(1, len(lists)):
-        #    union = self.merge(union, lists[i])
+        # convert the matching key words in to vector 
+        query = csr_matrix((val, ([0] * len(row), row)),
+        shape=(1, len(self.inverted_lists.keys())))
 
-        # Filter all postings with BM25 = 0.
-        union = [x for x in union if x[1] != 0]
+        # compute the hit rate
+        hit_rate = query.dot(self.td_matrix)
 
+        rows, cols = hit_rate.nonzero()
+        res = [None] * len(rows)
+        for i, (row, col) in enumerate(zip(rows, cols)):
+            res[i] = tuple((col + 1, hit_rate[row, col]))
+        
         # Sort the postings by BM25 scores, in descending order.
-        return sorted(union, key=lambda x: x[1], reverse=True)
+        return sorted(res, key=lambda x: x[1], reverse=True)
 
-
-    def process_query(self, keywords, use_refinements=False):
-        """
-        Process the given keyword query as follows: Fetch the inverted list for
-        each of the keywords in the query and compute the union of all lists.
-        Sort the resulting list by BM25 scores in descending order.
-
-        This method returns _all_ results for the given query, not just the
-        top 3!
-
-        If you want to implement some ranking refinements, make these
-        refinements optional (their use should be controllable via the
-        use_refinements flag).
-
-        >>> ii = InvertedIndex()
-        >>> ii.inverted_lists = {
-        ... "foo": [(1, 0.2), (3, 0.6)],
-        ... "bar": [(1, 0.4), (2, 0.7), (3, 0.5)],
-        ... "baz": [(2, 0.1)]}
-        >>> result = ii.process_query(["foo", "bar"], use_refinements=False)
-        >>> [(id, "%.1f" % tf) for id, tf in result]
-        [(3, '1.1'), (2, '0.7'), (1, '0.6')]
-        """
-        if not keywords:
-            return []
-
-        # Fetch the inverted lists for each of the given keywords.
-        lists = []
-        for keyword in keywords:
-            if keyword in self.inverted_lists:
-                lists.append(self.inverted_lists[keyword])
-
-        # Compute the union of all inverted lists.
-        if len(lists) == 0:
-            return []
-
-        union = lists[0]
-        for i in range(1, len(lists)):
-            union = self.merge(union, lists[i])
-
-        # Filter all postings with BM25 = 0.
-        union = [x for x in union if x[1] != 0]
-
-        # Sort the postings by BM25 scores, in descending order.
-        return sorted(union, key=lambda x: x[1], reverse=True)
-
-    def render_output(self, postings, keywords, k=3):
-        """
-        Render the output for the top-k of the given postings. Fetch the
-        the titles and descriptions of the related docs and highlight the
-        occurences of the given keywords in the output, using ANSI escape
-        codes.
-        """
-
-        # Compile a pattern to identify the given keywords in a string.
-        p = re.compile('\\b(' + '|'.join(keywords) + ')\\b', re.IGNORECASE)
-
-        # Output at most k matching docs.
-        for i in range(min(len(postings), k)):
-            doc_id, tf = postings[i]
-            title, desc = self.docs[doc_id - 1]  # doc_id is 1-based.
-
-            # Highlight the keywords in the title in bold and red.
-            title = re.sub(p, "\033[0m\033[1;31m\\1\033[0m\033[1m", title)
-
-            # Print the rest of the title in bold.
-            title = "\033[1m%s\033[0m" % title
-
-            # Highlight the keywords in the description in red.
-            desc = re.sub(p, "\033[31m\\1\033[0m", desc)
-
-            print("\n%s\n%s" % (title, desc))
-
-        print("\n# total hits: %s." % len(postings))
 
 if __name__ == "__main__":
     # Parse the command line arguments.

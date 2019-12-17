@@ -13,6 +13,11 @@ import numpy
 from scipy.sparse import csr_matrix
 import scipy
 
+
+DEFAULT_B = 0.75
+DEFAULT_K = 1.75
+
+
 class InvertedIndex:
     """
     An extended version of the inverted index of ES2 that uses Vector Space
@@ -177,30 +182,17 @@ class InvertedIndex:
          [1.000 0.182 0.000 0.222]]
         """
 
-        """
-        helper = numpy.zeros((len(self.inverted_lists), len(self.docs)))
-        record_id = 0
-        for key, val in self.inverted_lists.items():
-            for doc_id, bm25 in val:
-                # all word occurrence
-                helper[record_id][doc_id - 1] = bm25
-            record_id += 1
- 
-        # convert to csr
-        self.td_matrix = csr_matrix(helper)
-        """
-    
-        val = [] 
-        row = [] 
-        col = [] 
-        
+        val = []
+        row = []
+        col = []
+
         num_col = 0
         for records_id, (keys, bms) in enumerate(self.inverted_lists.items()):
             for doc_id, bm25 in bms:
                 if num_col < doc_id:
                     # max coll id is num of colls is num of documents
                     num_col = doc_id
-                
+
                 # all word occurrence
                 if bm25 != 0:
                     val.append(bm25)
@@ -208,7 +200,7 @@ class InvertedIndex:
                     col.append(doc_id - 1)
         # convert to csr
         self.td_matrix = csr_matrix((val, (row, col)), shape=(records_id + 1,
-        num_col))
+                                    num_col))
 
         if l2normalize:
             # compute l2-norme
@@ -233,19 +225,20 @@ class InvertedIndex:
          [0.577 0.707 0.707 0.756 0.707 0.707]
          [0.000 0.000 0.000 0.378 0.707 0.707]]
         """
-      
+
         # prepare matrix
         td_matrix = td_matrix.astype(float)
-        # get indexes of the cells
-        rows, cols = td_matrix.nonzero()
 
         ent_sum = scipy.zeros(td_matrix.shape[1])
+        # get indexes of the cells
+        rows, cols = td_matrix.nonzero()
         for row, col in zip(rows, cols):
             # sum up enteries by collumns
-            ent_sum[col] += td_matrix[row, col]**2        
+            ent_sum[col] += td_matrix[row, col]**2
 
         # compute the l2-norme
-        ent_sum = numpy.sqrt(ent_sum) / ent_sum 
+        for i in range(0, len(ent_sum)):
+            ent_sum[i] = numpy.sqrt(ent_sum[i]) / ent_sum[i]
 
         # write results back to matrix
         for row, col in zip(rows, cols):
@@ -294,9 +287,9 @@ class InvertedIndex:
         if len(val) == 0:
             return []
 
-        # convert the matching key words in to vector 
+        # convert the matching key words in to vector
         query = csr_matrix((val, ([0] * len(row), row)),
-        shape=(1, len(self.inverted_lists.keys())))
+                           shape=(1, len(self.inverted_lists.keys())))
 
         # compute the hit rate
         hit_rate = query.dot(self.td_matrix)
@@ -305,7 +298,7 @@ class InvertedIndex:
         res = [None] * len(rows)
         for i, (row, col) in enumerate(zip(rows, cols)):
             res[i] = tuple((col + 1, hit_rate[row, col]))
-        
+
         # Sort the postings by BM25 scores, in descending order.
         return sorted(res, key=lambda x: x[1], reverse=True)
 
@@ -339,8 +332,12 @@ if __name__ == "__main__":
         # Ask the user for a keyword query.
         query = input("\nYour keyword query: ")
 
-        # Split the query into keywords.
+        # Split the query into keywodocsrds.
         keywords = [x.lower().strip() for x in re.split("[^A-Za-z]+", query)]
 
         # Process the keywords.
         postings = ii.process_query_vsm(keywords)
+        for i, (index, bm25) in enumerate(postings):
+            if i > 4:
+                continue
+            print(ii.docs[index - 1])

@@ -325,7 +325,7 @@ if __name__ == "__main__":
     ii.build_from_file(file_name, b=b, k=k)
     print("Done")
     print("Building sparse term-document matrix.")
-    ii.preprocessing_vsm(l2normalize=True)
+    ii.preprocessing_vsm(l2normalize=False)
     print("Done")
 
     while True:

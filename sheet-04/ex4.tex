@@ -86,7 +86,8 @@ For $s<1, E\ L(X) < H(X)$ qed
 Show that \textit{Golomb} is \textit{entropy-optimal}.\\
 A code is optimal for $p_i \Rightarrow L_i \leq \log_2 \frac{1}{p_i} + O(1)$, with $p_i = (1-p)^{i-1} \cdot p$, $p < 1$ and $L_i = \lfloor \frac{i}{M} \rfloor + 1 + \lceil \log_2 M \rceil$.\\
 Let $i = 1$ than $p_i = p$ and for all $i >1$ is $p_i < p$, so $p_i \leq p \iff \frac{1}{p} \leq \frac{1}{p_i}$, $\forall i$.\\
-$M = \lceil \frac{1}{p} \cdot \ln 2 \rceil \leq \lceil \frac{1}{p} \cdot 1 \rceil  = M'$ \\
+$M = \lceil \frac{1}{p} \cdot \ln 2 \rceil} \leq \lceil \frac{1}{p} \cdot 1 \rceil  = M'$ \\% \leq \frac{1}{p} + 1 = M'$\\
+%$L_i \leq \lfloor \frac{i}{M'} \rfloor + 1 + \lceil \log_2 M' \rceil \leq \frac{i}{M'} + 1 + \lceil \log_2 M' \rceil \leq \frac{i}{(\frac{1}{p} + 1)} + \log_2 (\frac{1}{p} + 1) + 2 \leq i + \log_2 (\frac{1}{p} + 1) + 2 = \log_2 (\frac{1}{p} + 1) + i + 2$\\
 $L_i \leq \lfloor \frac{i}{M'} \rfloor + 1 + \lceil \log_2 M' \rceil \leq \frac{i}{M'} + 1 + \lceil \log_2 M' \rceil \leq \frac{i}{\lceil \frac{1}{p} \rceil} + \log_2 (\lceil \frac{1}{p} \rceil) + 1 \leq \frac{i}{\frac{1}{p} + 1}\log_2 (\frac{1}{p}) + 2$\\
 
 

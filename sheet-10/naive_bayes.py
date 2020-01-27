@@ -160,7 +160,7 @@ class NaiveBayes(object):
         for i in range(T):
             if y[i] > (len(T_c) - 1):
                 # increase label 
-                T_c.append([0] * (y[i] + 1 - len(T_c)))
+                T_c += [0] * (y[i] + 1 - len(T_c))
             T_c[y[i]] += 1 # number of docs with label at pos T_{y[i]}
             row[i] = y[i]
     
@@ -244,11 +244,10 @@ class NaiveBayes(object):
                 c_max = pred[i]
             
             # if appending needed
-            if c_max > helper.shape[1]:
-                c_ap = y[i] + 1 - len(c_max)
+            if c_max >= helper.shape[1]:
+                c_ap = c_max + 1 - helper.shape[1]
                 app = [[0] * c_ap, [0] * c_ap, [0] * c_ap]
                 helper = numpy.concatenate((helper, app), axis=1)
-                print(helper)
 
             helper[0, y[i]] += 1 # #docs with label 
             helper[1, pred[i]] += 1 # docs with label
@@ -281,21 +280,17 @@ if __name__ == '__main__':
     nb = NaiveBayes()
     nb.train(X_train, y_train)
     res = nb.predict(X_test)
-    
+    eva_p, eva_r, eva_f = nb.evaluate(X_test, y_test)  
 
     # Output the precision, recall, and F1 score on the test data, for
     #       each class separately as well as the (unweighted) average over all
     #       classes.
-    print("class\tprecision\trecalled\tF1-score")
-    for i, p_c in enumerate(nb.p_c):
-        print(class_vocab[i] + "\t" + p_c + "\t" + "?" )
-              #"\t" + "?")
+    print("class\tprecision\trecalled\tF1-score\taverage")
+    #print(class_vocab[class_vocab.keys()[i]])
+    for i in range(len(nb.p_c)):
+        print(list(class_vocab.keys())[i] + "\t" + str(eva_p[i]) + "\t" +
+        str(eva_r[i]) + "\t" + str(eva_f[i]) + "\t" + str(nb.p_c[i]))
 
-    #print("document\tclass\tprecision\trecalled\tF-measure")
-    #for i, doc_label in enumerate(res):
-        #print(i + "\t" + class_vocab[doc_label] + "\t" + "?" + "\t" + "?" +
-              #"\t" + "?")
-    print(nb.p_c)
 
     # TODO: Print the 30 words with the highest p_wc values per class which do
     #       not appear in the stopwords.txt provided on the Wiki.

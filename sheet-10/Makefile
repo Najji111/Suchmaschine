@@ -12,6 +12,9 @@ test:
 checkstyle:
 	$(CHECKSTYLE_CMD) *.py
 
+start:
+	python3 *.py example_train.txt example_test.txt
+
 clean:
 	rm -f *.pyc
 	rm -rf __pycache__

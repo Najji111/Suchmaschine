@@ -228,41 +228,8 @@ class NaiveBayes(object):
         {0: '0.67', 1: '0.67'}
         """
 
-        # pred labels for test file
-        pred = self.predict(x)
-
-        # (0,i):=actual labels
-        # (1,i):=labels predicted 
-        # (2,i):=labels in coman
-        helper = numpy.array([[0, 0], [0, 0], [0, 0]]) 
-        for i in range(len(y)):
-            # larger label
-            c_max = 0
-            if y[i] >= pred[i]:
-                c_max = y[i]
-            else:
-                c_max = pred[i]
-            
-            # if appending needed
-            if c_max > helper.shape[1]:
-                c_ap = y[i] + 1 - len(c_max)
-                app = [[0] * c_ap, [0] * c_ap, [0] * c_ap]
-                helper = numpy.concatenate((helper, app), axis=1)
-                print(helper)
-
-            helper[0, y[i]] += 1 # #docs with label 
-            helper[1, pred[i]] += 1 # docs with label
-            if y[i] == pred[i]:
-               helper[2, y[i]] += 1 # labes in coman
-            
-        res = [{}, {}, {}]
-        for i in range(helper.shape[1]):
-            res[0][i] = helper[2, i] / helper[1, i] # precision 
-            res[1][i] = helper[2, i] / helper[0, i] # recall 
-            res[2][i] = (2 * res[0][i] * res[1][i]) / \
-                        (res[0][i] + res[1][i]) # F-measure 
-
-        return res[0], res[1], res[2] 
+        # TODO: Implement this method.
+        return {}, {}, {}
 
 
 if __name__ == '__main__':
@@ -277,18 +244,14 @@ if __name__ == '__main__':
     X_train, y_train = read_labeled_data(train_input, class_vocab, word_vocab)
     X_test, y_test = read_labeled_data(test_input, class_vocab, word_vocab)
 
-    # Train on the training dataset.
+    # TODO: Train on the training dataset.
     nb = NaiveBayes()
     nb.train(X_train, y_train)
     res = nb.predict(X_test)
     
-
-    # Output the precision, recall, and F1 score on the test data, for
-    #       each class separately as well as the (unweighted) average over all
-    #       classes.
-    print("class\tprecision\trecalled\tF1-score")
-    for i, p_c in enumerate(nb.p_c):
-        print(class_vocab[i] + "\t" + p_c + "\t" + "?" )
+    print("class\tprecision\trecalled\tF-measure")
+    #for i, doc_label in enumerate(nb.p_c):
+        #print(i + "\t" + class_vocab[doc_label] + "\t" + "?" + "\t" + "?" +
               #"\t" + "?")
 
     #print("document\tclass\tprecision\trecalled\tF-measure")
@@ -296,6 +259,10 @@ if __name__ == '__main__':
         #print(i + "\t" + class_vocab[doc_label] + "\t" + "?" + "\t" + "?" +
               #"\t" + "?")
     print(nb.p_c)
+
+    # TODO: Output the precision, recall, and F1 score on the test data, for
+    #       each class separately as well as the (unweighted) average over all
+    #       classes.
 
     # TODO: Print the 30 words with the highest p_wc values per class which do
     #       not appear in the stopwords.txt provided on the Wiki.

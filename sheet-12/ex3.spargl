@@ -1,0 +1,1 @@
+SELECT ?x WHERE { ?x member_of_sports_team ?y . ?x educated_at ?z . ?x occupation Football_player } LIMIT 10

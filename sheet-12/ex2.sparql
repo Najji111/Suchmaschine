@@ -1,0 +1,1 @@
+SELECT ?x ?y WHERE { ?x sex_or_gender Female . ?x country_of_citizenship Germany . ?x occupation Computer_scientist . ?x educated_at ?y }

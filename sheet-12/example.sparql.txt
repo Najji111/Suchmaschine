@@ -1,0 +1,1 @@
+SELECT ?x ?y WHERE { ?x occupation politician . ?x country_of_citizenship Germany . ?x spouse ?y . ?x place_of_birth ?z . ?y place_of_birth ?z }

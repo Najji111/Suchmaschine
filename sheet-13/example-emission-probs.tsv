@@ -1,0 +1,13 @@
+James	NNP	0.33
+James	NN	0.1
+James	OTHER	0.2
+Bond	NNP	0.33
+Bond	VB	0.2
+Bond	OTHER	0.2
+agent	NN	0.8
+is	VB	0.6
+likes	VB	0.2
+an	OTHER	0.6
+and	CC	1
+martini	NNP	0.33
+martini	NN	0.1
